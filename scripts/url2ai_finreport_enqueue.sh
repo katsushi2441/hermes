@@ -12,7 +12,7 @@ fi
 export RQDB4AI_API_URL="${RQDB4AI_API_URL:-http://192.168.0.3:18300}"
 
 cd /home/kojima/exdirect/url2ai
-git pull origin main >/dev/null
+git pull origin main >/dev/null 2>&1 || echo "git pull skipped; using current url2ai checkout" >&2
 response="$(scripts/enqueue_finreport_auto_cycle.sh)"
 echo "$response"
 

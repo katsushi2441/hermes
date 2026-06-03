@@ -14,7 +14,7 @@ export OSS_PERIOD="${OSS_PERIOD:-daily}"
 export OSS_TOP_N="${OSS_TOP_N:-3}"
 
 cd /home/kojima/exdirect/url2ai
-git pull origin main >/dev/null
+git pull origin main >/dev/null 2>&1 || echo "git pull skipped; using current url2ai checkout" >&2
 response="$(scripts/enqueue_oss_auto_cycle.sh)"
 echo "$response"
 
