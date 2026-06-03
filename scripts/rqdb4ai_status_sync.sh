@@ -141,36 +141,9 @@ for fn, job in latest.items():
     else:
         status = "down"
 
-    count_keys = ("created", "registered", "success_count", "items", "selected")
-    items = 0
-    for key in count_keys:
-        value = result.get(key)
-        if isinstance(value, int):
-            items = value
-            break
-    if status != "down" and items == 0:
-        stdout_tail = str(result.get("stdout_tail") or "")
-        match = re.search(r"worker report:\s*ok\s+items=(\d+)", stdout_tail)
-        if match:
-            items = int(match.group(1))
-        elif "AIxSNS posted id=" in stdout_tail:
-            items = 1
-        elif fn == "horizon_jobs.worker_auto_cycle_job":
-            response_result = ((result.get("response") or {}).get("result") or {})
-            if response_result.get("started"):
-                items = 1
-        elif fn == "aixec_market_jobs.market_pipeline_job" and rq_status == "finished" and result_status == "ok":
-            market_result_path = Path("/home/kojima/exdirect/aixec/tasks/market_task_result.json")
-            if market_result_path.exists():
-                try:
-                    market_result = json.loads(market_result_path.read_text(encoding="utf-8"))
-                    if isinstance(market_result.get("registered"), int):
-                        items = int(market_result.get("registered") or 0)
-                        for key in ("registered", "created", "updated", "selected", "candidates"):
-                            if key not in result and key in market_result:
-                                result[key] = market_result[key]
-                except Exception:
-                    pass
+    items = result.get("items")
+    if not isinstance(items, int):
+        items = 0
 
     actual_time = normalize_time(job.get("ended_at") or job.get("started_at") or job.get("created_at"))
     bits = [f"rq={rq_status}", f"job={job.get('id', '')}"]
@@ -178,21 +151,18 @@ for fn, job in latest.items():
         bits.append(f"queue={queue_name}")
     if rq_status in ("queued", "deferred", "scheduled") and queue_name and queue_name not in active_queue_names:
         bits.append("orphan_queue")
-    for key in ("top_n", "created", "registered", "updated", "selected", "success_count"):
-        if key in result:
-            bits.append(f"{key}={result.get(key)}")
+    metrics = result.get("metrics") if isinstance(result.get("metrics"), dict) else {}
+    for key in ("created", "registered", "updated", "skipped", "failed", "selected", "top_n", "youtube_uploaded", "videos_created", "articles_created"):
+        if key in metrics:
+            bits.append(f"{key}={metrics.get(key)}")
+    if result.get("note"):
+        bits.append(str(result.get("note"))[:120])
     if result_status:
         bits.append(f"result={result_status}")
     if result_reason:
         bits.append(f"reason={result_reason}"[:80])
     if err.get("message"):
         bits.append("error=" + str(err.get("message"))[:80])
-    elif fn == "horizon_jobs.worker_auto_cycle_job":
-        response_result = ((result.get("response") or {}).get("result") or {})
-        if response_result:
-            bits.append("trigger_started=" + str(bool(response_result.get("started"))))
-            if response_result.get("pid"):
-                bits.append("pid=" + str(response_result.get("pid")))
     elif job.get("ended_at"):
         bits.append("ended=" + str(job.get("ended_at"))[:19])
 

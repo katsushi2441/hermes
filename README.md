@@ -24,6 +24,8 @@ The following stay under `/home/kojima/.hermes` and are not committed:
 
 RQDB4AI workers run on a separate server. This server only enqueues jobs and syncs real RQDB4AI status back to the AIxEC dashboard.
 
+RQDB4AI result handling is standardized in [RQDB4AI_RESULT_SPEC.md](RQDB4AI_RESULT_SPEC.md). Do not add worker-specific dashboard parsing. Every worker must return the common result shape.
+
 ## Dashboard
 
 `webapps/dashboard.php` is the Hermes / RQDB4AI operations dashboard. It is not an AIxEC product dashboard; it only uses the AIxEC API endpoint as the current public API surface for worker status, schedule, and Ollama health.
