@@ -160,9 +160,11 @@ for job in jobs:
         latest[fn] = job
 
 status_path = Path("/home/kojima/exdirect/aixec/storage/worker_status.json")
+current_status_records = {}
 if status_path.exists():
     try:
         current = json.loads(status_path.read_text(encoding="utf-8"))
+        current_status_records = current if isinstance(current, dict) else {}
     except Exception:
         current = {}
     reverse_name_map = {v: k for k, v in name_map.items()}
@@ -216,6 +218,17 @@ for fn, job in latest.items():
     items, metrics = extract_items_and_metrics(result)
 
     actual_time = normalize_time(job.get("ended_at") or job.get("started_at") or job.get("created_at"))
+    current_record = current_status_records.get(name_map[fn]) if isinstance(current_status_records, dict) else None
+    if (
+        rq_status == "finished"
+        and items == 0
+        and result.get("trigger_started")
+        and isinstance(current_record, dict)
+        and int(current_record.get("items") or 0) > 0
+        and not str(current_record.get("note") or "").startswith("rq=finished")
+    ):
+        print(name_map[fn], "keep-current", current_record.get("items"), current_record.get("note", ""))
+        continue
     bits = [f"rq={rq_status}", f"job={job.get('id', '')}"]
     if queue_name:
         bits.append(f"queue={queue_name}")
