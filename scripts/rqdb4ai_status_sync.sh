@@ -126,7 +126,9 @@ for fn, job in latest.items():
     result_status = str(result.get("status") or "")
     result_reason = str(result.get("reason") or "")
 
-    if rq_status == "finished" and result_status in ("skipped", "failed", "error"):
+    if rq_status in ("failed", "stopped", "canceled"):
+        status = "down"
+    elif rq_status == "finished" and result_status in ("skipped", "failed", "error"):
         status = "down"
     elif rq_status in ("queued", "deferred", "scheduled") and queue_name and queue_name not in active_queue_names:
         status = "down"
@@ -146,7 +148,7 @@ for fn, job in latest.items():
         if isinstance(value, int):
             items = value
             break
-    if items == 0:
+    if status != "down" and items == 0:
         stdout_tail = str(result.get("stdout_tail") or "")
         match = re.search(r"worker report:\s*ok\s+items=(\d+)", stdout_tail)
         if match:

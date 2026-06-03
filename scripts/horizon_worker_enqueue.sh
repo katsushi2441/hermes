@@ -73,7 +73,7 @@ payload = json.dumps({
     "name": "horizon-worker-enqueue",
     "status": "queued" if ok else "down",
     "items": 0,
-    "note": f"RQDB4AI enqueue {status} job={job_id} queue={queue}"[:200],
+    "note": f"RQDB4AI enqueue {status} job={job_id} queue={queue}; waiting for actual result"[:200],
 }).encode("utf-8")
 
 req = urllib.request.Request(
