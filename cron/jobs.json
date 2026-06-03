@@ -303,7 +303,45 @@
       "enabled_toolsets": null,
       "workdir": null,
       "profile": null
+    },
+    {
+      "id": "rqdb4ai-status-sync",
+      "name": "rqdb4ai-status-sync",
+      "prompt": "",
+      "skills": [],
+      "skill": null,
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": "rqdb4ai_status_sync.sh",
+      "no_agent": true,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "*/10 * * * *",
+        "display": "*/10 * * * *"
+      },
+      "schedule_display": "*/10 * * * *",
+      "repeat": {
+        "times": null,
+        "completed": 0
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-03T19:25:00+09:00",
+      "next_run_at": null,
+      "last_run_at": null,
+      "last_status": null,
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": null,
+      "enabled_toolsets": null,
+      "workdir": null,
+      "profile": null
     }
   ],
-  "updated_at": "2026-06-03T15:00:11.715239+09:00"
+  "updated_at": "2026-06-03T19:30:15.193255+09:00"
 }

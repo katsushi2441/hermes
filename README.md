@@ -27,3 +27,5 @@ RQDB4AI workers run on a separate server. This server only enqueues jobs and syn
 ## Dashboard
 
 `webapps/dashboard.php` is the Hermes / RQDB4AI operations dashboard. It is not an AIxEC product dashboard; it only uses the AIxEC API endpoint as the current public API surface for worker status, schedule, and Ollama health.
+
+`rqdb4ai-status-sync` runs every 10 minutes so dashboard rows do not remain stuck at `running` after the RQDB4AI job has finished.
