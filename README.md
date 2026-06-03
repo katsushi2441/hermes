@@ -1,0 +1,25 @@
+# Hermes Job Configuration
+
+This repository stores the ExBridge-managed Hermes enqueue scripts and the current cron job snapshot.
+
+## Layout
+
+- `scripts/` - Active Hermes scripts. These are the source of truth.
+- `cron/jobs.json` - Current managed job snapshot. Hermes mutates its live `~/.hermes/cron/jobs.json`, so treat this file as a reviewed baseline.
+- `rqdb4ai.env.example` - Environment variable example. Do not commit real tokens.
+- `install.sh` - Links `~/.hermes/scripts` to this repository and optionally copies the managed cron snapshot.
+
+## Runtime Files Not Managed Here
+
+The following stay under `/home/kojima/.hermes` and are not committed:
+
+- `rqdb4ai.env`
+- Hermes skills
+- Hermes agent runtime
+- cron output logs
+- SQLite / WAL files
+- update/cache files
+
+## Rule
+
+RQDB4AI workers run on a separate server. This server only enqueues jobs and syncs real RQDB4AI status back to the AIxEC dashboard.

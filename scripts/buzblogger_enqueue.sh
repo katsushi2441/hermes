@@ -1,0 +1,91 @@
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ENV_FILE=/home/kojima/.hermes/rqdb4ai.env
+if [ -f "$ENV_FILE" ]; then
+  set -a
+  source "$ENV_FILE"
+  set +a
+fi
+
+export RQDB4AI_API_URL="${RQDB4AI_API_URL:-http://192.168.0.3:18300}"
+
+response="$(python3 - <<'PY'
+import json
+import os
+import urllib.request
+
+api_url = os.environ["RQDB4AI_API_URL"].rstrip("/")
+token = os.environ["RQDB4AI_API_TOKEN"]
+
+payload = {
+    "queue": "ollama-192-168-0-14-worker",
+    "function": "buzblogger_jobs.worker_auto_cycle_job",
+    "kwargs": {
+        "dry_run": False,
+        "source": "worker_auto",
+        "resource": "ollama",
+        "ollama_host": "192.168.0.14",
+        "ollama_model": "gemma4:e4b",
+    },
+    "meta": {
+        "project": "buzblogger",
+        "app": "buzblogger",
+        "source": "worker_auto",
+        "resource": "ollama",
+        "ollama_host": "192.168.0.14",
+        "ollama_model": "gemma4:e4b",
+    },
+    "timeout": 900,
+}
+
+req = urllib.request.Request(
+    f"{api_url}/api/enqueue",
+    data=json.dumps(payload).encode("utf-8"),
+    headers={
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    },
+    method="POST",
+)
+
+with urllib.request.urlopen(req, timeout=30) as res:
+    print(res.read().decode("utf-8"))
+PY
+)"
+echo "$response"
+
+python3 - "$response" <<'PY'
+import json
+import sys
+import urllib.request
+
+response = json.loads(sys.argv[1])
+job = response.get("job") or {}
+job_id = job.get("id") or ""
+queue = job.get("queue") or ""
+status = job.get("status") or ""
+ok = bool(response.get("ok"))
+
+payload = json.dumps({
+    "name": "buzblogger-enqueue",
+    "status": "queued" if ok else "down",
+    "items": 0,
+    "note": f"RQDB4AI enqueue {status} job={job_id} queue={queue}"[:200],
+}).encode("utf-8")
+
+req = urllib.request.Request(
+    "http://127.0.0.1:8081/worker/report",
+    data=payload,
+    headers={"Content-Type": "application/json"},
+    method="POST",
+)
+try:
+    with urllib.request.urlopen(req, timeout=10) as res:
+        res.read()
+except Exception as exc:
+    print(f"worker/report failed: {exc}", file=sys.stderr)
+PY
+# Refresh dashboard with actual RQDB4AI job status when possible.
+"/rqdb4ai_status_sync.sh" || true
