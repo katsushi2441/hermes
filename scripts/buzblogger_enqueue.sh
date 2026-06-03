@@ -88,4 +88,4 @@ except Exception as exc:
     print(f"worker/report failed: {exc}", file=sys.stderr)
 PY
 # Refresh dashboard with actual RQDB4AI job status when possible.
-"/rqdb4ai_status_sync.sh" || true
+"$SCRIPT_DIR/rqdb4ai_status_sync.sh" || true
