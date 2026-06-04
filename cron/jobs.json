@@ -341,7 +341,45 @@
       "enabled_toolsets": null,
       "workdir": null,
       "profile": null
+    },
+    {
+      "id": "aixec-market-pipeline-extra-0230-1030",
+      "name": "aixec-market-pipeline-enqueue",
+      "prompt": "",
+      "skills": [],
+      "skill": null,
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": "aixec_market_pipeline_enqueue.sh",
+      "no_agent": true,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "30 2,10 * * *",
+        "display": "30 2,10 * * *"
+      },
+      "schedule_display": "30 2,10 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 0
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-04T11:56:58.704899+09:00",
+      "next_run_at": null,
+      "last_run_at": null,
+      "last_status": null,
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": null,
+      "enabled_toolsets": null,
+      "workdir": null,
+      "profile": null
     }
   ],
-  "updated_at": "2026-06-03T19:30:15.193255+09:00"
+  "updated_at": "2026-06-04T11:56:58.704899+09:00"
 }
