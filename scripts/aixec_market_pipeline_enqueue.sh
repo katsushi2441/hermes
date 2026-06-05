@@ -33,6 +33,8 @@ payload = {
         "pages": 3,
         "max_candidates": 600,
         "score_mode": "heuristic",
+        "submit_url": "http://192.168.0.2:8081/market/register-task",
+        "submit_timeout": 600,
         "task": task,
     },
     "meta": {
