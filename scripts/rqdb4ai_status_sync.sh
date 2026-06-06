@@ -64,7 +64,7 @@ def post_report(name, status, items, note, reported_at=""):
         "reported_at": reported_at,
     }, ensure_ascii=False).encode("utf-8")
     req = urllib.request.Request(
-        "http://127.0.0.1:8081/worker/report",
+        "http://192.168.0.14:8081/worker/report",
         data=payload,
         headers={"Content-Type": "application/json"},
         method="POST",
